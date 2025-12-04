@@ -1,0 +1,5 @@
+{
+  "name": "ProPresenter Timer",
+  "description": "A high-visibility, full-screen countdown timer for speakers with AI-powered agenda generation capabilities.",
+  "requestFramePermissions": []
+}
