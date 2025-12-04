@@ -44,11 +44,11 @@ export const TimeDisplay: React.FC<TimeDisplayProps> = ({
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full">
-      <div className={clsx("text-massive font-black tabular-nums tracking-tighter transition-colors duration-300 leading-none", textColor)}>
-        {isOvertime && <span className="text-4xl md:text-6xl align-top font-bold block text-center mb-2 text-red-500 tracking-normal">TIME UP</span>}
+      <div className={clsx("text-[20vw] md:text-massive font-black tabular-nums tracking-tighter transition-colors duration-300 leading-none", textColor)}>
+        {isOvertime && <span className="text-3xl md:text-6xl align-top font-bold block text-center mb-2 md:mb-4 text-red-500 tracking-normal">TIME UP</span>}
         {paddedMins}:{paddedSecs}
       </div>
-      <div className={clsx("text-4xl md:text-6xl font-bold opacity-80 uppercase tracking-widest mt-6 text-center", textColor)}>
+      <div className={clsx("text-xl md:text-6xl font-bold opacity-80 uppercase tracking-widest mt-4 md:mt-6 text-center", textColor)}>
         {labelText}
       </div>
     </div>

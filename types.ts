@@ -24,6 +24,7 @@ export type PeerCommandType =
   | 'START'
   | 'PAUSE_TOGGLE'
   | 'RESET'
+  | 'RESTART'
   | 'ADD_MINUTE'
   | 'SUB_MINUTE'
   | 'SYNC_STATE'

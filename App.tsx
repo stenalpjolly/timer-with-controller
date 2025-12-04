@@ -4,6 +4,7 @@ import { SetupForm } from './components/SetupForm';
 import { TimeDisplay } from './components/TimeDisplay';
 import { SegmentDisplay } from './components/SegmentDisplay';
 import { RemoteControl } from './components/RemoteControl';
+import { LandingPage } from './components/LandingPage';
 import { Maximize2, Minimize2, Pause, Play, RotateCcw, X, Wifi } from 'lucide-react';
 import { Peer } from 'peerjs';
 
@@ -16,7 +17,7 @@ const App: React.FC = () => {
   
   // Remote Features
   const [pairingCode, setPairingCode] = useState('');
-  const [isRemoteMode, setIsRemoteMode] = useState(false);
+  const [viewMode, setViewMode] = useState<'LANDING' | 'HOST' | 'CLIENT'>('LANDING');
   const [connections, setConnections] = useState<any[]>([]);
 
   const peerRef = useRef<Peer | null>(null);
@@ -124,6 +125,13 @@ const App: React.FC = () => {
       case 'RESET':
         handleReset();
         break;
+      case 'RESTART':
+        if (config) {
+            setSecondsRemaining(config.totalMinutes * 60);
+            setSecondsElapsed(0);
+            setStatus(TimerStatus.PAUSED);
+        }
+        break;
       case 'ADD_MINUTE':
         setSecondsRemaining(prev => prev + 60);
         break;
@@ -196,16 +204,42 @@ const App: React.FC = () => {
 
   // --- RENDER ---
 
-  if (isRemoteMode) {
-    return <RemoteControl onBack={() => setIsRemoteMode(false)} />;
+  if (viewMode === 'CLIENT') {
+    return <RemoteControl onBack={() => setViewMode('LANDING')} />;
   }
 
+  if (viewMode === 'LANDING') {
+      return <LandingPage onSelectHost={() => setViewMode('HOST')} onSelectClient={() => setViewMode('CLIENT')} />;
+  }
+
+  // If IDLE, check if we have connections. If so, act as Slave Display (Waiting).
   if (status === TimerStatus.IDLE) {
+      if (connections.length > 0) {
+          return (
+              <div className="flex flex-col h-screen bg-slate-950 text-white items-center justify-center p-6 text-center relative">
+                  <div className="bg-green-900/20 p-6 rounded-full mb-6 animate-pulse">
+                      <Wifi size={48} className="text-green-400" />
+                  </div>
+                  <h1 className="text-3xl font-bold mb-2">Connected</h1>
+                  <p className="text-slate-400 text-lg">Waiting for remote command...</p>
+                  
+                  <div className="mt-8 p-4 bg-slate-900 rounded-xl border border-slate-800">
+                      <div className="text-xs text-slate-500 uppercase font-bold mb-1">Room Code</div>
+                      <div className="text-2xl font-mono font-bold text-indigo-400 tracking-widest">{pairingCode}</div>
+                  </div>
+
+                  <div className="absolute bottom-6 text-slate-600 text-sm">
+                      {connections.length} Remote{connections.length !== 1 && 's'} Connected
+                  </div>
+              </div>
+          );
+      }
+
     return (
-        <SetupForm 
-            onStart={handleStart} 
-            pairingCode={pairingCode} 
-            onJoinRemote={() => setIsRemoteMode(true)}
+        <SetupForm
+            onStart={handleStart}
+            pairingCode={pairingCode}
+            onJoinRemote={() => setViewMode('CLIENT')}
         />
     );
   }
@@ -234,30 +268,30 @@ const App: React.FC = () => {
       )}
 
       {/* Persistent Touch-Friendly Controls */}
-      <div className="absolute bottom-0 left-0 right-0 z-50 p-6 flex items-center justify-center gap-6 bg-slate-950/50 backdrop-blur-lg border-t border-slate-800">
+      <div className="absolute bottom-0 left-0 right-0 z-50 p-4 md:p-6 flex items-center justify-center gap-3 md:gap-6 bg-slate-950/50 backdrop-blur-lg border-t border-slate-800">
          
-         <button 
+         <button
             onClick={handlePauseToggle}
-            className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-bold text-xl transition-all shadow-lg active:scale-95 ${
-                status === TimerStatus.RUNNING 
-                ? 'bg-slate-800 text-white hover:bg-slate-700' 
+            className={`flex items-center gap-2 md:gap-3 px-6 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl font-bold text-lg md:text-xl transition-all shadow-lg active:scale-95 ${
+                status === TimerStatus.RUNNING
+                ? 'bg-slate-800 text-white hover:bg-slate-700'
                 : 'bg-indigo-600 text-white hover:bg-indigo-500'
             }`}
          >
             {status === TimerStatus.RUNNING ? (
                 <>
-                    <Pause size={28} fill="currentColor" />
+                    <Pause size={24} fill="currentColor" className="md:w-7 md:h-7" />
                     PAUSE
                 </>
             ) : (
                 <>
-                    <Play size={28} fill="currentColor" />
+                    <Play size={24} fill="currentColor" className="md:w-7 md:h-7" />
                     RESUME
                 </>
             )}
          </button>
          
-         <button 
+         <button
             onClick={() => {
                 if(config) {
                     setSecondsRemaining(config.totalMinutes * 60);
@@ -265,22 +299,32 @@ const App: React.FC = () => {
                     setStatus(TimerStatus.PAUSED);
                 }
             }}
-            className="p-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl transition-all shadow-lg border border-slate-700 active:scale-95"
+            className="p-3 md:p-4 bg-slate-800 hover:bg-slate-700 text-white rounded-xl md:rounded-2xl transition-all shadow-lg border border-slate-700 active:scale-95"
             title="Restart Timer"
          >
-            <RotateCcw size={28} />
+            <RotateCcw size={24} className="md:w-7 md:h-7" />
          </button>
 
-         <div className="w-px h-12 bg-slate-700 mx-2" />
+         <div className="w-px h-10 md:h-12 bg-slate-700 mx-1 md:mx-2" />
 
-         <button 
+         <button
             onClick={handleReset}
-            className="flex items-center gap-2 px-6 py-4 bg-red-900/50 hover:bg-red-900/80 text-red-200 hover:text-white rounded-2xl transition-all shadow-lg border border-red-900/50 active:scale-95 font-bold"
+            className="flex items-center gap-2 px-4 py-3 md:px-6 md:py-4 bg-red-900/50 hover:bg-red-900/80 text-red-200 hover:text-white rounded-xl md:rounded-2xl transition-all shadow-lg border border-red-900/50 active:scale-95 font-bold text-lg md:text-xl"
          >
-            <X size={28} />
-            CLOSE
+            <X size={24} className="md:w-7 md:h-7" />
+            <span className="hidden sm:inline">CLOSE</span>
+            <span className="sm:hidden">EXIT</span>
          </button>
       </div>
+
+      {/* Back to Home Button (Only visible when IDLE or explicitly wanted, but here we are in HOST mode) */}
+      {status === TimerStatus.IDLE && (
+          <div className="absolute top-6 left-6 z-50">
+              <button onClick={() => setViewMode('LANDING')} className="text-slate-500 hover:text-white text-sm">
+                  ← Home
+              </button>
+          </div>
+      )}
 
       {/* Top Right Tools */}
       <div className="absolute top-6 right-6 z-50 flex items-center gap-4">
