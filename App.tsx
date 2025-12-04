@@ -21,6 +21,11 @@ const App: React.FC = () => {
   const [connections, setConnections] = useState<any[]>([]);
 
   const peerRef = useRef<Peer | null>(null);
+  const configRef = useRef(config);
+
+  useEffect(() => {
+    configRef.current = config;
+  }, [config]);
 
   // --- WAKE LOCK ---
   const wakeLockRef = React.useRef<WakeLockSentinel | null>(null);
@@ -98,6 +103,7 @@ const App: React.FC = () => {
   }, [broadcastState]);
 
   const handleRemoteCommand = (msg: PeerMessage) => {
+    console.log('Received Remote Command:', msg);
     switch (msg.type) {
       case 'GET_STATE':
         // The effect hook will handle sending the state because connections changed or we can force it
@@ -126,10 +132,14 @@ const App: React.FC = () => {
         handleReset();
         break;
       case 'RESTART':
-        if (config) {
-            setSecondsRemaining(config.totalMinutes * 60);
+        const currentConfig = configRef.current;
+        console.log('Processing RESTART. Config:', currentConfig);
+        if (currentConfig) {
+            setSecondsRemaining(currentConfig.totalMinutes * 60);
             setSecondsElapsed(0);
             setStatus(TimerStatus.PAUSED);
+        } else {
+            console.warn('RESTART failed: No config');
         }
         break;
       case 'ADD_MINUTE':

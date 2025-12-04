@@ -246,7 +246,7 @@ export const RemoteControl: React.FC<RemoteControlProps> = ({ onBack }) => {
                 </button>
 
                 <button
-                    onClick={() => { if(confirm('Reset Timer?')) sendCommand('RESET'); }}
+                    onClick={() => sendCommand('RESET')}
                     className="py-6 bg-red-900/30 hover:bg-red-900/50 text-red-200 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-95 border border-red-900/30"
                 >
                     <RotateCcw className="rotate-180" /> STOP/RESET
