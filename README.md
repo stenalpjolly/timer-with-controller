@@ -61,15 +61,34 @@ A professional, remote-controllable countdown timer designed for stage displays 
 - **P2P Communication**: PeerJS (WebRTC)
 - **Deployment**: Docker support included
 
-## Docker Deployment
+## Deployment
 
-Build and run with Docker:
+### 1-Click Deployment
 
+Deploy your own instance for free on Vercel or Netlify. Since the app uses PeerJS (P2P), no backend server is required.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fstenalpjolly%2Ftimer-with-controller) [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/stenalpjolly/timer-with-controller)
+
+### Docker & Cloud Run Deployment
+
+For self-hosting or enterprise deployment on Google Cloud Run:
+
+**Option A: Docker Compose (Local)**
 ```bash
 docker-compose up --build -d
 ```
+The app will be available at `http://localhost:8080` (served via Nginx).
 
-The app will be available at `http://localhost:3000` (served via Nginx).
+**Option B: Single-Command Cloud Run Deployment**
+Ensure you have the `gcloud` CLI installed and authenticated.
+
+```bash
+./deploy.sh
+```
+You can optionally provide environment variables:
+```bash
+PROJECT_ID="my-project-id" REGION="us-east1" ./deploy.sh
+```
 
 ## License
 
